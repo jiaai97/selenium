@@ -1,80 +1,79 @@
-const { Builder, By } = require("selenium-webdriver");
+const { Builder, By, until } = require("selenium-webdriver");
+const readline = require("readline");
+const fs = require("fs");
 
 async function whatsapp() {
     driver = await new Builder().forBrowser("chrome").build();
     await driver.get("https://web.whatsapp.com/");
     console.log("Please scan the QR code");
-    const element = await driver.findElement(By.xpath("//div[@class='_1QMFu']"));
 
-    var millisecondsToWait = 15000;
-    setTimeout(function() {
-        console.log("Scanned!");
-        console.log("Waiting...");
-        try {
-            phone_no = "14155238886";
-            sendMessage(phone_no);
-            sendMessageWithMedia(phone_no);
-            // phone_no = ["14155238886"];
-            // // phone_no.forEach(element => {
-            // //     sendMessage(element);
-            // //     sendMessageWithMedia(element);
-            // // });
-            // console.log(phone_no.length);
-            // var i = 0;
-            // while ( phone_no.length !== 0 ) {
-            //     let number = phone_no[i];
-            //     sendMessage(number);
-            //     sendMessageWithMedia(number);
-            //     phone_no.length -= 1;
-            //     console.log(phone_no.length);
-            //     i++;
-            //     console.log(i);
-            // }
-        } catch (err){
-            console.error('Exception!\n', err.stack, '\n');
-            driver.quit();
+    let search = await driver.wait(until.elementLocated(By.xpath("//div[@class='_2FVVk cBxw-']//div[@class='_3FRCZ copyable-text selectable-text']")), 30000);
+    console.log("Scanned!");
+
+    const csvFile = fs.createReadStream('names.csv');
+
+    const rl = readline.createInterface({
+        input: csvFile,
+        crlfDelay: Infinity
+    });
+
+    phone_no = ["0165786561", "0109639289", "14155238886"];
+
+    try {
+        for (let i = 0; i < phone_no.length; i++) {
+            setTimeout(function () {
+                console.log('line' + i +': ' + phone_no[i]);
+                number = phone_no[i];
+                // sendMessage(search, number);
+                sendMessageWithMedia(search, number);
+            // }, 3000 * i);
+            }, 8000 * i);
         }
-    }, millisecondsToWait);
+        // for await (const line of rl) {
+        //     console.log('line: ' + line);
+        //     number = line;
+        //     sendMessage(search, number);
+        //     setTimeout(function() {
+        //         sendMessageWithMedia(search, number);
+        //     }, 5000);
+        // }
+
+    } catch (err){
+        console.error('Exception!\n', err.stack, '\n');
+        driver.quit();
+    }
 
 }
 whatsapp();
 
-function sendMessage(phone_no) {
-    driver.findElement(By.xpath("//div[@class='_2FVVk cBxw-']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys(phone_no + "\n");
+function sendMessage(search, phone_no) {
+    console.log(phone_no);
+    search.sendKeys(phone_no, "\n");
     setTimeout(function() {
-        driver.findElement(By.xpath("//div[@class='_2FVVk cBxw-']//div[@class='_3FRCZ copyable-text selectable-text']")).click();
+        search.click();
         setTimeout(function() {
-            driver.findElement(By.xpath("//div[@class='_2FVVk _2UL8j']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys("abc", "\n");
-            console.log("send message sucessfully!");
+            let messagebox = driver.wait(until.elementLocated(By.xpath("//div[@class='_2FVVk _2UL8j']//div[@class='_3FRCZ copyable-text selectable-text']")), 1000);
+            messagebox.sendKeys("testing", "\n");
+            console.log("send message sucessfully to " + phone_no);
         }, 1000);
     }, 1000);
 }
 
-function sendMessageWithMedia(phone_no) {
-    driver.findElement(By.xpath("//div[@class='_2FVVk cBxw-']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys(phone_no + "\n");
+function sendMessageWithMedia(search, phone_no) {
+    console.log(phone_no)
+    search.sendKeys(phone_no, "\n");
     setTimeout(function() {
         driver.findElement(By.xpath("//div[@class='_3nq_A']//div[2]//div[1]")).click();
         setTimeout(function() {
             const uploadElement = driver.findElement(By.xpath("//li[1]//button[1]//input[1]"));
             uploadElement.sendKeys("C:\\Users\\AsahiArts\\Downloads\\WhatsApp Image 2020-06-30 at 09.16.23.jpeg");
             setTimeout(function() {
-                driver.findElement(By.xpath("//div[@class='_2FVVk _3WjMU _1C-hz']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys("qwe", "\n");
-                console.log("send message with media sucessfully!");
-            }, 1000);
+                driver.findElement(By.xpath("//div[@class='H36t4 _19AnP']")).click();
+                setTimeout(function() {
+                    driver.findElement(By.xpath("//div[@class='_2FVVk _3WjMU _1C-hz']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys("qwe", "\n");
+                    console.log("send message with media sucessfullyto " + phone_no);
+                }, 1000)
+            }, 2000);
         }, 1000);
     }, 3000);
 }
-
-// function sendMessageWithMedia() {
-//     driver.findElement(By.xpath("//div[@class='_2FVVk cBxw-']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys("Twilio" + "\n");
-//     setTimeout(function() {
-//         driver.findElement(By.xpath("//div[@class='_3nq_A']//div[2]//div[1]")).click();
-//         setTimeout(function() {
-//             // driver.findElement(By.xpath("//li[1]//button[1]")).click();
-//             setTimeout(function() {
-//                 const uploadElement = driver.findElement(By.xpath("//li[1]//button[1]//input[1]"));
-//                 uploadElement.sendKeys("C:\\Users\\AsahiArts\\Downloads\\WhatsApp Image 2020-06-30 at 09.16.23.jpeg");
-//             }, 1000);
-//         }, 1000);
-//     }, 3000);
-// }
