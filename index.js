@@ -17,26 +17,32 @@ async function whatsapp() {
         crlfDelay: Infinity
     });
 
-    phone_no = ["0165786561", "0109639289", "14155238886"];
+    // phone_no = ["0165786561", "0109639289", "14155238886"];
 
     try {
-        for (let i = 0; i < phone_no.length; i++) {
-            setTimeout(function () {
-                console.log('line' + i +': ' + phone_no[i]);
-                number = phone_no[i];
-                // sendMessage(search, number);
-                sendMessageWithMedia(search, number);
-            // }, 3000 * i);
-            }, 8000 * i);
-        }
-        // for await (const line of rl) {
-        //     console.log('line: ' + line);
-        //     number = line;
-        //     sendMessage(search, number);
-        //     setTimeout(function() {
-        //         sendMessageWithMedia(search, number);
-        //     }, 5000);
+        // for (let i = 0; i < phone_no.length; i++) {
+        //     setTimeout(function () {
+        //         console.log('line ' + i +': ' + phone_no[i]);
+        //         number = phone_no[i];
+        //         sendMessage(search, number);
+        //         // sendMessageWithMedia(search, number);
+        //     }, 3000 * i);
+        //     // }, 8000 * i);
         // }
+
+        var lineno = -1;
+        for await (const line of rl) {
+            lineno++;
+            setTimeout(function () {
+                
+            // send message only
+                sendMessage(search, line);
+            }, 3000 * lineno);
+
+            // // send message with image selected
+            //     sendMessageWithMedia(search, line);
+            // }, 8000 * lineno);
+        }
 
     } catch (err){
         console.error('Exception!\n', err.stack, '\n');
@@ -71,7 +77,7 @@ function sendMessageWithMedia(search, phone_no) {
                 driver.findElement(By.xpath("//div[@class='H36t4 _19AnP']")).click();
                 setTimeout(function() {
                     driver.findElement(By.xpath("//div[@class='_2FVVk _3WjMU _1C-hz']//div[@class='_3FRCZ copyable-text selectable-text']")).sendKeys("qwe", "\n");
-                    console.log("send message with media sucessfullyto " + phone_no);
+                    console.log("send message with media sucessfully to " + phone_no);
                 }, 1000)
             }, 2000);
         }, 1000);
